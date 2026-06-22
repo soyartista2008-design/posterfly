@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="google-site-verification" content="dz6JTQwOoYx3WEvEQfbKbYzOTHwbdynOR6AxuFz5PKI" />
+    
+    <title>PosterFly | Crear Moldes para Piñatas e Imprimir Imágenes Grandes</title>
+    <meta name="description" content="Crea moldes para piñatas e imprime imágenes grandes en varias hojas. Escala personajes, dibujos y fotografías a tamaño real en PDF. Compatible con Carta, Oficio, A3 y A4.">
+    <meta name="keywords" content="PosterFly, moldes para piñatas, escalar imagenes para poster, imprimir imagenes gigantes, moldes piñateros, ahorrar papel">
+    <meta name="robots" content="index, follow">
+
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo-container">
+            <div class="logo">
+                <img src="logo.png" alt="PosterFly Logo" class="logo-img">
+                Poster<span class="logo-bold">Fly</span>
+            </div>
+        </div>
+        <p class="subtitle">Herramienta de escalado profesional para artesanos piñateros</p>
+    </header>
+
+    <main class="app-container">
+        
+        <section class="panel-control">
+            <h2>1. Configuración del Molde</h2>
+            
+            <div class="control-group">
+                <label for="imageInput" class="drop-zone" id="dropZone">
+                    <span class="icon">📁</span>
+                    <span class="text">Arrastra tu imagen aquí o haz clic para buscar</span>
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                </label>
+            </div>
+
+            <div class="control-group">
+                <label class="label-title">Tamaño del Papel:</label>
+                <select id="tipoPapel">
+                    <option value="carta">Carta (Tradicional - 21.6 x 27.9 cm)</option>
+                    <option value="oficio">Oficio (Largo - 21.6 x 34.0 cm)</option>
+                    <option value="a3">A3 (Póster Grande - 29.7 x 42.0 cm)</option>
+                    <option value="a4">A4 (Estándar Oficina - 21.0 x 29.7 cm)</option>
+                    <option value="a5">A5 (Folleto Chico - 14.8 x 21.0 cm)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label class="label-title">Orientación del Papel:</label>
+                <div class="toggle-options">
+                    <label class="toggle-btn">
+                        <input type="radio" name="orientacion" value="p" checked> <span>↕️ Vertical</span>
+                    </label>
+                    <label class="toggle-btn">
+                        <input type="radio" name="orientacion" value="l"> <span>↔️ Horizontal</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="label-title">Modo de Color:</label>
+                <div class="toggle-options">
+                    <label class="toggle-btn">
+                        <input type="radio" name="modoColor" value="color" checked> <span>🎨 A Color</span>
+                    </label>
+                    <label class="toggle-btn">
+                        <input type="radio" name="modoColor" value="bw"> <span>⚫ Blanco y Negro</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="label-title">¿Cómo ajustar el tamaño?</label>
+                <div class="radio-options">
+                    <label>
+                        <input type="radio" name="modoCalculo" value="medidas" checked> Por Centímetros
+                    </label>
+                    <label>
+                        <input type="radio" name="modoCalculo" value="hojas"> Por Hojas de Ancho
+                    </label>
+                </div>
+            </div>
+
+            <div id="inputsMedidas" class="control-group">
+                <label class="label-title">Altura de la piñata (cm):</label>
+                <input type="number" id="alturaCm" value="100" min="20" max="300">
+                <p class="helper-text">*Mantiene la proporción exacta para evitar el "efecto fideo".</p>
+            </div>
+
+            <div id="inputsHojas" class="control-group hidden">
+                <label class="label-title">Número de hojas a lo ancho:</label>
+                <input type="number" id="hojasAncho" value="3" min="1" max="15">
+            </div>
+
+            <div class="stats-box">
+                <p class="stat-item">✨ <strong>Hojas a imprimir:</strong> <span id="lblTotalHojas">0</span> <span id="lblHojasAhorradas" class="ahorro-text"></span></p>
+                <p class="stat-item">📐 <span id="lblMedidaFinalTxt">Medida final aprox:</span> <strong id="lblMedidaFinal">0 x 0 cm</strong></p>
+                <p class="stat-badge">🍃 Optimizado para ahorrar 15% de tinta negra</p>
+            </div>
+
+            <div class="premium-box hidden" id="premiumBox">
+                <div class="premium-header">
+                    <span class="premium-badge">✨ PRO</span>
+                    <h4>¿Tu imagen se ve borrosa o pixelada?</h4>
+                </div>
+                <p class="premium-text">Suaviza las líneas pixeladas a estilo vectorial y realza los colores vivos del personaje para tu molde por solo <strong>$30.00 MXN</strong>.</p>
+                <div id="paypal-button-container" style="margin-top: 10px; min-height: 150px;"></div>
+            </div>
+            
+            <button id="btnDescargar" class="btn-primary" disabled>
+                🖨️ Descargar PDF para Imprimir
+            </button>
+        </section>
+
+        <section class="panel-preview">
+            <h2>2. Vista Previa Interactiva</h2>
+            <p class="instruccion-tactil hidden" id="txtInstruccion">💡 <strong>Consejo de ahorro:</strong> Haz clic o toca las hojas que salgan vacías (sin dibujo) para apagarlas y no gastar papel.</p>
+            
+            <div class="preview-wrapper" id="previewWrapper">
+                <p id="placeholderText">Sube la imagen de tu personaje para configurar el molde...</p>
+                <div id="gridInteractiva" class="grid-hojas hidden"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <section class="faq-section">
+        <h3>Preguntas Frecuentes para Piñateros</h3>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h4>¿Cómo apago las hojas vacías en PosterFly?</h4>
+                <p>Una vez que subas la foto, verás el molde dividido en hojas. Si una esquina no tiene dibujo, dale un clic encima. Se pondrá de color gris oscuro, lo que significa que el PDF final ignorará esa página y no desperdiciarás material.</p>
+            </div>
+            <div class="faq-item">
+                <h4>¿Por qué imprimir en modo Horizontal ahorra hojas?</h4>
+                <p>Si tu personaje u objeto es más ancho que alto (por ejemplo, un carro, un logotipo o un animal acostado), la orientación horizontal acomoda mejor los cortes, rellenando más espacio útil en cada hoja.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="seo-content" style="max-width:1200px;margin:40px auto;padding:20px;line-height:1.8;">
+
+    <h1>PosterFly - Generador de Moldes para Piñatas e Impresión de Imágenes Gigantes</h1>
+
+    <p>
+        PosterFly es una herramienta diseñada para artesanos piñateros, emprendedores y personas que necesitan
+        convertir una imagen pequeña en un molde grande listo para imprimir. Con PosterFly puedes escalar fotografías,
+        personajes, logotipos y dibujos a cualquier tamaño utilizando hojas carta, oficio, A3 o A4, obteniendo un
+        PDF dividido automáticamente para facilitar el armado de tus proyectos.
+    </p>
+
+    <h2>¿Qué es PosterFly y para qué sirve?</h2>
+
+    <p>
+        PosterFly permite crear moldes profesionales para piñatas, decoraciones, carteles y manualidades.
+        Solo necesitas subir una imagen, seleccionar el tamaño deseado y descargar un PDF listo para imprimir.
+        El sistema calcula automáticamente la cantidad de hojas necesarias y te ayuda a ahorrar papel eliminando
+        páginas vacías que no contienen partes del diseño.
+    </p>
+
+    <p>
+        Nuestra herramienta está especialmente optimizada para la elaboración de piñatas de personajes,
+        figuras infantiles, caricaturas, superhéroes, letras gigantes, números para fiestas y cualquier diseño
+        que requiera ampliación precisa manteniendo las proporciones originales.
+    </p>
+
+    <h2>Ventajas de usar PosterFly</h2>
+
+    <ul>
+        <li>Escalado automático de imágenes sin deformaciones.</li>
+        <li>Compatible con hojas Carta, Oficio, A3, A4 y A5.</li>
+        <li>Generación instantánea de PDF para impresión.</li>
+        <li>Vista previa interactiva del molde.</li>
+        <li>Ahorro de papel al desactivar hojas vacías.</li>
+        <li>Ideal para artesanos piñateros y negocios de decoración.</li>
+        <li>Funciona directamente desde el navegador sin instalar programas.</li>
+    </ul>
+
+    <h2>Preguntas Frecuentes</h2>
+
+    <div class="faq-grid">
+
+        <div class="faq-item">
+            <h3>¿Cómo imprimir una imagen grande en varias hojas?</h3>
+            <p>
+                Sube la imagen a PosterFly, selecciona el tamaño deseado y descarga el PDF generado.
+                El sistema dividirá automáticamente la imagen en varias hojas listas para imprimir.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿Cómo hacer moldes para piñatas grandes?</h3>
+            <p>
+                Puedes escalar cualquier personaje o diseño a la altura deseada en centímetros.
+                PosterFly mantiene las proporciones originales para evitar deformaciones.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿Qué tamaño debe tener una piñata?</h3>
+            <p>
+                La mayoría de las piñatas infantiles miden entre 80 y 120 centímetros de altura,
+                aunque el tamaño puede ajustarse según el evento o la cantidad de dulces.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿Puedo usar fotografías para crear moldes?</h3>
+            <p>
+                Sí. Puedes subir fotografías, dibujos digitales, personajes animados,
+                logotipos o cualquier imagen compatible con formatos comunes.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿Cómo ahorrar papel al imprimir moldes?</h3>
+            <p>
+                Utiliza la vista previa interactiva para desactivar hojas vacías que no contienen
+                partes importantes del diseño antes de generar el PDF final.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿PosterFly funciona en celular?</h3>
+            <p>
+                Sí. La herramienta puede utilizarse desde teléfonos móviles, tablets y computadoras
+                con conexión a internet.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿Qué formatos de papel son compatibles?</h3>
+            <p>
+                PosterFly es compatible con tamaños Carta, Oficio, A3, A4 y A5 para adaptarse
+                a distintos tipos de impresoras y proyectos.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿Cómo ampliar una imagen sin perder proporción?</h3>
+            <p>
+                El sistema calcula automáticamente la escala adecuada para mantener la relación
+                entre ancho y alto de la imagen original.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿Puedo imprimir personajes para piñatas?</h3>
+            <p>
+                Sí. PosterFly es utilizado para crear moldes de personajes infantiles, caricaturas,
+                superhéroes, princesas, animales y figuras decorativas.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>¿Necesito instalar algún programa?</h3>
+            <p>
+                No. Todo el proceso funciona directamente desde tu navegador y el PDF se genera
+                automáticamente en línea.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+    <footer style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <p>&copy; 2026 PosterFly. Diseñado para facilitar el trabajo de los artesanos piñateros.</p>
+        <p><a href="privacidad.html" style="color: #6366F1; text-decoration: none; font-weight: 600;" target="_blank">Aviso de Privacidad Legal</a></p>
+    </footer>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=AaO1faNOtrYKStCo1TBVdlaqVUOn7t1TjSGrt4KND0nU9rihhIe-_BUAWUhlYapOL6_KzCpEDv4tH5NE&currency=MXN"></script>
+    <script src="app.js"></script>
+</body>
+</html>

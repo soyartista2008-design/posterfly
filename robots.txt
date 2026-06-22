@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://posterfly.netlify.app/sitemap.xml
